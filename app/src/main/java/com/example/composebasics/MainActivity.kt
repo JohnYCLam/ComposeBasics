@@ -24,6 +24,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,6 +54,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp() {
+    val moneyCounter = remember { mutableIntStateOf(0) }
+    //Or use below code
+    // var moneyCounter by remember { mutableIntStateOf(0) }
     Surface(
         modifier = Modifier
             .fillMaxHeight()
@@ -58,21 +66,35 @@ fun MyApp() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("$100", style = TextStyle(color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold))
+            Text("${100 + moneyCounter.intValue}", style = TextStyle(color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold))
             Spacer(modifier = Modifier.height(20.dp))
-            CreateCircle()
+            CreateCircle() {
+                moneyCounter.intValue += 1
+            }
+            if (moneyCounter.intValue > 25) {
+                Text("A lot of money!")
+            }
         }
     }
 }
 
 
 @Composable
-fun CreateCircle() {
+fun CreateCircle(updateMoneyCounter:() -> Unit) {
+
     Card(
         modifier = Modifier
             .padding(3.dp)
             .size(60.dp)
-            .clickable { Log.d("Tapped", "Create Circle Tap") },
+            .clickable {
+                        Log.d("Tapped", "Create Circle Tap")
+                        // if use = remember, then needs to add .value
+                        //moneyCounter.value += 1
+                        // if use by remember, then just write
+                        // moneyCounter += 1
+                        updateMoneyCounter()
+                        //Log.d("Counter", "Count: $moneyCounter")
+                        },
         shape = CircleShape,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
